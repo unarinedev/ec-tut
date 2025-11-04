@@ -1,0 +1,301 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class TaskManagerExample {
+
+    public static void main(String[] args) {
+        
+        // Initialize ArrayList
+        List<String> pendingTasks = new ArrayList<>(); 
+        
+        System.out.println("--- Task Manager Initialized ---");
+        
+        // Add tasks
+        pendingTasks.add("Write report draft");
+        pendingTasks.add("Schedule meeting with team");
+        pendingTasks.add("Review code for feature X");
+        pendingTasks.add("Send expense reports"); 
+        
+        // 3. Display the total number of tasks
+        System.out.println("\nTotal initial tasks: " + pendingTasks.size()); 
+        
+        // 4. Access and display the task at index 1
+        String secondTask = pendingTasks.get(1); 
+        System.out.println("The second task is: " + secondTask);
+        
+        // 5. Remove the task at index 0
+        String removedTask = pendingTasks.remove(0); 
+        System.out.println("\nCompleted and removed task: " + removedTask);
+        
+        // 6. Iterate and display remaining tasks
+        System.out.println("\n--- Final Pending Task List (" + pendingTasks.size() + " tasks) ---");
+        for (String task : pendingTasks) { 
+            System.out.println("- " + task);
+        }
+    }
+}
+
+
+
+//hashmap
+import java.util.HashMap;
+import java.util.Map;
+
+public class MapExample {
+
+    public static void main(String[] args) {
+        
+        // 1. Initialize a generic HashMap
+        Map<Integer, String> employeeRegistry = new HashMap<>(); 
+        
+        System.out.println("--- HashMap (Employee Registry) ---");
+
+        // 2. Add three key-value pairs (put)
+        employeeRegistry.put(101, "Alice Johnson");
+        employeeRegistry.put(205, "Bob Smith");
+        employeeRegistry.put(310, "Carlos Diaz"); 
+        employeeRegistry.put(205, "Bob Smith (Updated)"); // Demonstrates key uniqueness (override)
+        
+        System.out.println("Map size after adds: " + employeeRegistry.size());
+        
+        // 3. Retrieve a value using a specific key (get)
+        String employeeName = employeeRegistry.get(310);
+        System.out.println("Employee 310 is: " + employeeName);
+        
+        // 4. Iterate over the Map using the entrySet() view
+        System.out.println("\n--- Iterating via EntrySet ---");
+        for (Map.Entry<Integer, String> entry : employeeRegistry.entrySet()) {
+            System.out.println("ID: " + entry.getKey() + " | Name: " + entry.getValue());
+        }
+        
+        // 5. Remove one employee using their key (remove)
+        String removed = employeeRegistry.remove(101);
+        System.out.println("\nRemoved employee: " + removed);
+        System.out.println("Map size after removal: " + employeeRegistry.size());
+    }
+}
+
+
+//hashset
+import java.util.HashSet;
+import java.util.Set;
+
+public class SetExample {
+
+    public static void main(String[] args) {
+        
+        // 1. Initialize a generic HashSet
+        Set<String> uniqueSensorIDs = new HashSet<>(); 
+        
+        System.out.println("--- HashSet (Unique Sensor IDs) ---");
+        
+        // 2. Add several sensor IDs, including duplicates
+        uniqueSensorIDs.add("SENSOR_A4");
+        boolean added1 = uniqueSensorIDs.add("SENSOR_B9");
+        boolean added2 = uniqueSensorIDs.add("SENSOR_A4"); // Duplicate attempt
+        uniqueSensorIDs.add("SENSOR_C1");
+        
+        // 3. Demonstrate that duplicates are ignored
+        System.out.println("Result of adding duplicate 'SENSOR_A4': " + added2); // Should print false
+        System.out.println("Final Set size: " + uniqueSensorIDs.size());
+        
+        // 4. Check if a specific sensor ID exists (contains)
+        boolean exists = uniqueSensorIDs.contains("SENSOR_C1");
+        System.out.println("Does 'SENSOR_C1' exist? " + exists);
+        
+        // 5. Iterate and display the final list of unique IDs
+        System.out.println("\n--- Final Unique Sensor IDs ---");
+        for (String id : uniqueSensorIDs) {
+            System.out.println("ID: " + id);
+        }
+    }
+}
+
+
+//linkedlist/queue
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class QueueExample {
+
+    public static void main(String[] args) {
+        
+        // 1. Initialize a generic Queue using LinkedList
+        Queue<String> customerQueue = new LinkedList<>(); 
+        
+        System.out.println("--- Queue (Customer Service Line) ---");
+        
+        // 2. Add four customers (offer)
+        customerQueue.offer("Customer 1 (Naledi)");
+        customerQueue.offer("Customer 2 (Thabo)");
+        customerQueue.offer("Customer 3 (Aisha)");
+        customerQueue.offer("Customer 4 (Lerato)");
+        
+        System.out.println("Current Queue: " + customerQueue);
+        
+        // 3. View the customer at the front without removing (peek)
+        String nextUp = customerQueue.peek();
+        System.out.println("Next customer to be served (Peek): " + nextUp);
+        
+        // 4. Serve the first two customers (poll)
+        String served1 = customerQueue.poll();
+        String served2 = customerQueue.poll();
+        System.out.println("\nServed: " + served1 + " and " + served2);
+        
+        // 5. Display the final size and the next customer waiting
+        System.out.println("Remaining customers: " + customerQueue.size());
+        System.out.println("Next up: " + customerQueue.peek());
+        System.out.println("Final Queue: " + customerQueue);
+    }
+}
+
+//stack
+import java.util.Stack;
+
+public class StackExample {
+
+    public static void main(String[] args) {
+        
+        // 1. Initialize a generic Stack
+        Stack<Double> calculatorStack = new Stack<>(); 
+        
+        System.out.println("--- Stack (Calculator History) ---");
+        
+        // 2. Add three numbers (push)
+        calculatorStack.push(10.5);
+        calculatorStack.push(5.0);
+        calculatorStack.push(2.5);
+        
+        System.out.println("Stack content: " + calculatorStack);
+        
+        // 3. View the last number added without removing (peek)
+        Double lastNumber = calculatorStack.peek();
+        System.out.println("Last number added (Peek): " + lastNumber);
+        
+        // 4. Perform a simulated operation by removing the last two numbers (pop twice)
+        Double operand2 = calculatorStack.pop();
+        Double operand1 = calculatorStack.pop();
+        Double result = operand1 + operand2;
+        
+        System.out.println("\nOperation: " + operand1 + " + " + operand2 + " = " + result);
+        
+        // Push the result back onto the stack
+        calculatorStack.push(result);
+        
+        // 5. Display the remaining stack content
+        System.out.println("Stack size after operation: " + calculatorStack.size());
+        System.out.println("Final Stack: " + calculatorStack);
+    }
+}
+
+
+//combined
+import java.util.*;
+
+public class CombinedDataStructures {
+
+    public static void main(String[] args) {
+        
+        // --- Initialization of Data Structures ---
+
+        // 1. LIST (ArrayList): Main ordered roster of all students
+        List<Student> mainRoster = new ArrayList<>(); 
+        
+        // 2. MAP (HashMap): For quick lookup of student final marks by ID
+        Map<String, Double> studentMarks = new HashMap<>(); 
+        
+        // 3. SET (HashSet): To track unique module codes offered by the department
+        Set<String> uniqueModules = new HashSet<>();
+        
+        // 4. QUEUE (LinkedList): For FIFO assignment of lecturer marking tasks
+        Queue<Lecturer> markingQueue = new LinkedList<>(); 
+        
+        // 5. STACK: To record and undo recent administrative actions (LIFO history)
+        Stack<String> historyStack = new Stack<>();
+
+        // --- 1. LIST (ArrayList) & INITIALIZATION ---
+        System.out.println("--- 1. LIST (ArrayList): Main Roster ---");
+        
+        Student s1 = new Student("S1001", "Naledi Radebe", "AOP216D");
+        Student s2 = new Student("S1002", "Thabo Zulu", "AOR216D");
+        Student s3 = new Student("S1003", "Aisha Khan", "AOP216D");
+        
+        mainRoster.add(s1);
+        mainRoster.add(s2);
+        mainRoster.add(s3);
+        
+        System.out.println("Initial Roster Size: " + mainRoster.size());
+        System.out.println("Student at Index 1: " + mainRoster.get(1)); // List is ordered
+        historyStack.push("Added 3 students to roster.");
+        
+        // --- 2. MAP (HashMap) ---
+        System.out.println("\n--- 2. MAP (HashMap): Student Mark Lookup ---");
+        
+        studentMarks.put(s1.getStudentId(), 78.5); // ID as Key
+        studentMarks.put(s2.getStudentId(), 65.0);
+        studentMarks.put(s3.getStudentId(), 89.2);
+        
+        // Quick lookup by key
+        String targetId = "S1002";
+        System.out.println("Thabo Zulu's Mark (Lookup by ID): " + studentMarks.get(targetId));
+        historyStack.push("Recorded marks for 3 students.");
+
+        // --- 3. SET (HashSet) ---
+        System.out.println("\n--- 3. SET (HashSet): Unique Module Codes ---");
+        
+        uniqueModules.add(s1.getModuleCode());
+        uniqueModules.add(s2.getModuleCode());
+        uniqueModules.add("AOP216D"); // Adding a duplicate
+        uniqueModules.add("FIN300C"); // Adding a new module
+        
+        System.out.println("Unique Modules Registered: " + uniqueModules);
+        System.out.println("Set size (duplicates ignored): " + uniqueModules.size());
+        historyStack.push("Updated unique module list.");
+
+        // --- 4. QUEUE (LinkedList) ---
+        System.out.println("\n--- 4. QUEUE (LinkedList): Marking Task Assignment (FIFO) ---");
+        
+        Lecturer l1 = new Lecturer("L201", "Mr. Mulenga");
+        Lecturer l2 = new Lecturer("L202", "Ms. Mulumba");
+        
+        // Add lecturers to the marking queue (FIFO order)
+        markingQueue.offer(l1); 
+        markingQueue.offer(l2); 
+        markingQueue.offer(new Lecturer("L203", "Mr. Sibiya")); 
+        
+        System.out.println("Next up for marking task (Peek): " + markingQueue.peek());
+        System.out.println("Assigning task to first lecturer (Poll): " + markingQueue.poll());
+        System.out.println("Next lecturer in line: " + markingQueue.peek());
+        historyStack.push("Assigned first marking task.");
+
+        // --- 5. STACK ---
+        System.out.println("\n--- 5. STACK: Administrative History (LIFO) ---");
+        
+        System.out.println("Total actions recorded: " + historyStack.size());
+        
+        // Undo the last action (LIFO)
+        String lastAction = historyStack.pop();
+        System.out.println("Undoing last action (Pop): " + lastAction);
+        
+        // View the new last action
+        String nextLastAction = historyStack.peek();
+        System.out.println("Current last recorded action (Peek): " + nextLastAction);
+        
+        // --- 6. LINKED LIST (Implicitly covered by Queue) ---
+
+        // --- MAP ITERATION (EntrySet) ---
+        System.out.println("\n--- MAP ITERATION (Displaying Marks using KeySet/EntrySet) ---");
+        
+        System.out.println("Final Mark Roster:");
+        for (String id : studentMarks.keySet()) {
+            // Find student name from mainRoster (less efficient, but demonstrates joining data)
+            String name = mainRoster.stream()
+                                    .filter(s -> s.getStudentId().equals(id))
+                                    .findFirst()
+                                    .map(Student::getName)
+                                    .orElse("N/A");
+                                    
+            System.out.println(String.format("- %s (%s): %.1f%%", name, id, studentMarks.get(id)));
+        }
+    }
+}

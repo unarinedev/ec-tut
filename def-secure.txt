@@ -1,0 +1,531 @@
+//app
+package securemessagesapp;
+
+import za.ac.tut.ui.SecureMessageFrame;
+
+
+public class SecureMessagesApp {
+
+  
+    public static void main(String[] args) {
+        new SecureMessageFrame();
+
+    }
+    
+}
+
+//frame
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package za.ac.tut.ui;
+
+/**
+ *
+ * @author 223116981 UG Seanego
+ */
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class SecureMessagesFrame extends JFrame {
+    
+    private JTextArea plainMessageTextArea;
+    private JTextArea encryptedMessageTextArea;
+    private JMenuBar menuBar;
+    private JMenu fileMenu;
+    private JMenuItem openFileMenuItem;
+    private JMenuItem encryptMessageMenuItem;
+    private JMenuItem saveEncryptedMessageMenuItem;
+    private JMenuItem clearMenuItem;
+    private JMenuItem exitMenuItem;
+    private static final String DB_URL = "jdbc:derby:SecureMessagesDB;create=true";
+    private Connection connection;
+    
+    public SecureMessagesFrame() {
+        initializeComponents();
+        setupLayout();
+        setupListeners();
+        setupDatabase();
+        setFrameProperties();
+    }
+    
+    private void initializeComponents() {
+        // Initialize text areas
+        plainMessageTextArea = new JTextArea(10, 30);
+        encryptedMessageTextArea = new JTextArea(10, 30);
+        
+        // Initialize menu bar and menu items
+        menuBar = new JMenuBar();
+        fileMenu = new JMenu("File");
+        
+        openFileMenuItem = new JMenuItem("Open file");
+        encryptMessageMenuItem = new JMenuItem("Encrypt message");
+        saveEncryptedMessageMenuItem = new JMenuItem("Save encrypted message");
+        clearMenuItem = new JMenuItem("Clear");
+        exitMenuItem = new JMenuItem("Exit");
+    }
+    
+    private void setupLayout() {
+        setLayout(new BorderLayout());
+        
+        // Create panels for text areas
+        JPanel inputPanel = new JPanel(new BorderLayout());
+        inputPanel.setBorder(BorderFactory.createTitledBorder("Plain message"));
+        inputPanel.add(new JScrollPane(plainMessageTextArea), BorderLayout.CENTER);
+        
+        JPanel outputPanel = new JPanel(new BorderLayout());
+        outputPanel.setBorder(BorderFactory.createTitledBorder("Encrypted message"));
+        outputPanel.add(new JScrollPane(encryptedMessageTextArea), BorderLayout.CENTER);
+        
+        // Create main content panel
+        JPanel contentPanel = new JPanel(new GridLayout(1, 2, 10, 10));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        contentPanel.add(inputPanel);
+        contentPanel.add(outputPanel);
+        
+        // Setup menu
+        fileMenu.add(openFileMenuItem);
+        fileMenu.add(encryptMessageMenuItem);
+        fileMenu.add(saveEncryptedMessageMenuItem);
+        fileMenu.addSeparator();
+        fileMenu.add(clearMenuItem);
+        fileMenu.addSeparator();
+        fileMenu.add(exitMenuItem);
+        
+        menuBar.add(fileMenu);
+        setJMenuBar(menuBar);
+        
+        add(contentPanel, BorderLayout.CENTER);
+    }
+    
+    private void setupListeners() {
+        openFileMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openFile();
+            }
+        });
+        
+        encryptMessageMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                encryptMessage();
+            }
+        });
+        
+        saveEncryptedMessageMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveEncryptedMessage();
+            }
+        });
+        
+        clearMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clearTextAreas();
+            }
+        });
+        
+        exitMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                exitApplication();
+            }
+        });
+    }
+    
+    private void setupDatabase() {
+        try {
+            // Load Derby driver
+            Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+            connection = DriverManager.getConnection(DB_URL);
+            
+            // Create messages table if it doesn't exist
+            String createTableSQL = "CREATE TABLE messages (" +
+                    "id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+                    "encrypted_message CLOB, " +
+                    "timestamp VARCHAR(50)" +
+                    ")";
+            
+            try (Statement stmt = connection.createStatement()) {
+                stmt.execute(createTableSQL);
+            } catch (SQLException e) {
+                // Table might already exist, which is fine
+                if (!e.getSQLState().equals("X0Y32")) { // X0Y32 means table already exists
+                    throw e;
+                }
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Database initialization failed: " + e.getMessage(), 
+                "Database Error", 
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void openFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Open Plain Text File");
+        
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            try {
+                String content = new String(Files.readAllBytes(Paths.get(selectedFile.getAbsolutePath())));
+                plainMessageTextArea.setText(content);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, 
+                    "Error reading file: " + e.getMessage(), 
+                    "File Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void encryptMessage() {
+        String plainText = plainMessageTextArea.getText();
+        if (plainText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, 
+                "Please enter a plain message first.", 
+                "No Message", 
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        String encryptedText = caesarEncrypt(plainText);
+        encryptedMessageTextArea.setText(encryptedText);
+    }
+    
+    private String caesarEncrypt(String text) {
+        StringBuilder encrypted = new StringBuilder();
+        text = text.toLowerCase();
+        
+        for (char c : text.toCharArray()) {
+            if (Character.isLetter(c)) {
+                char encryptedChar = (char) (((c - 'a' + 3) % 26) + 'a');
+                encrypted.append(encryptedChar);
+            } else {
+                encrypted.append(c);
+            }
+        }
+        
+        return encrypted.toString();
+    }
+    
+    private void saveEncryptedMessage() {
+        String encryptedMessage = encryptedMessageTextArea.getText();
+        if (encryptedMessage.isEmpty()) {
+            JOptionPane.showMessageDialog(this, 
+                "No encrypted message to save. Please encrypt a message first.", 
+                "No Message", 
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        try {
+            String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            
+            String insertSQL = "INSERT INTO messages (encrypted_message, timestamp) VALUES (?, ?)";
+            try (PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
+                pstmt.setString(1, encryptedMessage);
+                pstmt.setString(2, timestamp);
+                pstmt.executeUpdate();
+            }
+            
+            JOptionPane.showMessageDialog(this, 
+                "Encrypted message saved to database successfully!", 
+                "Success", 
+                JOptionPane.INFORMATION_MESSAGE);
+            
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error saving to database: " + e.getMessage(), 
+                "Database Error", 
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void clearTextAreas() {
+        plainMessageTextArea.setText("");
+        encryptedMessageTextArea.setText("");
+    }
+    
+    private void exitApplication() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            // Ignore closing errors
+        }
+        System.exit(0);
+    }
+    
+    private void setFrameProperties() {
+        setTitle("Secure Messages");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(800, 600);
+        setLocationRelativeTo(null); // Center the frame
+    }
+}
+
+//or frame
+// SecureMessagesApp  
+package securemessagesapp;
+
+import za.ac.tut.ui.SecureMessagesFrame;
+
+public class SecureMessagesApp {
+
+    public static void main(String[] args) {
+        new SecureMessagesFrame();
+    }
+
+}
+
+//SecureMessagesFrameLibrary  
+package za.ac.tut.ui; import java.awt.BorderLayout; import java.awt.Color; import java.awt.FlowLayout; import java.awt.Font; import java.awt.event.ActionEvent; import java.awt.event.ActionListener; import java.io.BufferedReader; import java.io.BufferedWriter; import java.io.File; import java.io.FileWriter; import java.io.FileReader; import java.io.IOException; 
+
+import java.io.InputStreamReader; import java.io.OutputStreamWriter; import java.io.PrintWriter; import java.net.InetAddress; import java.net.Socket; import java.net.UnknownHostException; import java.util.logging.Level; import java.util.logging.Logger; import javax.swing.JFileChooser; import javax.swing.JFrame; import static javax.swing.JFrame.EXIT_ON_CLOSE; import javax.swing.JLabel; import javax.swing.JMenu; import javax.swing.JMenuBar; import javax.swing.JMenuItem; import javax.swing.JOptionPane; import javax.swing.JPanel; import javax.swing.JScrollPane; import javax.swing.JTextArea; import javax.swing.border.BevelBorder; import javax.swing.border.LineBorder;
+
+import javax.swing.border.TitledBorder;  
+
+ public class SecureMessagesFrame extends JFrame {
+
+    private JMenuBar menuBar;
+    private JMenu fileMenu;
+    items private JMenuItem openFileMenuItem;
+    private JMenuItem encryptFileMenuItem;
+    private JMenuItem saveEncryptedFileMenuItem;
+    private JMenuItem clearFileMenuItem;
+    private JMenuItem exitFileMenuItem;
+    private JPanel headingPnl;
+    private JPanel plainTextPnl;
+    private JPanel encryptedTextPnl;
+    private JPanel mainPnl;
+
+    private JLabel headingLbl;
+    private JTextArea plainMsgTxtArea;
+    private JTextArea encryptedMsgTxtArea;
+    private JScrollPane scrollablePlainMsgTxtArea;
+    private JScrollPane scrollableEncryptedMsgTxtArea;
+
+    public SecureMessagesFrame() {
+        setTitle("Secure Messages");
+        setSize(50, 100);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        bar menuBar = new JMenuBar();
+        fileMenu = new JMenu("File");
+
+        openFileMenuItem = new JMenuItem("Open file...");
+        openFileMenuItem.addActionListener(new OpenFileMenuItemListener());
+        encryptFileMenuItem = new JMenuItem("Encrypt message...");
+        encryptFileMenuItem.addActionListener(new EncryptFileMenuItemListener());
+        saveEncryptedFileMenuItem = new JMenuItem("Save encrypted message...");
+        saveEncryptedFileMenuItem.addActionListener(new SaveEncryptedFileMenuItemListener());
+        clearFileMenuItem = new JMenuItem("Clear");
+        clearFileMenuItem.addActionListener(new ClearFileMenuItemListener());
+        exitFileMenuItem = new JMenuItem("Exit");
+        exitFileMenuItem.addActionListener(new ExitFileMenuItemListener());
+
+        fileMenu.add(openFileMenuItem);
+        fileMenu.add(encryptFileMenuItem);
+        fileMenu.add(saveEncryptedFileMenuItem);
+        fileMenu.addSeparator();
+        fileMenu.add(clearFileMenuItem);
+        fileMenu.add(exitFileMenuItem);
+
+        menuBar.add(fileMenu);
+        headingPnl = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        plainTextPnl = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        plainTextPnl.setBorder(new TitledBorder(new LineBorder(Color.BLACK, 1), "Plain message"));
+        encryptedTextPnl = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        encryptedTextPnl.setBorder(new TitledBorder(new LineBorder(Color.BLACK, 1), "Encrypted message"));
+        mainPnl = new JPanel(new BorderLayout());
+        label headingLbl = new JLabel("Message Encryptor");
+        headingLbl.setForeground(Color.BLUE);
+        headingLbl.setFont(new Font("SERIF", Font.BOLD + Font.ITALIC, 30));
+        headingLbl.setBorder(new BevelBorder(BevelBorder.RAISED));
+        plainMsgTxtArea = new JTextArea(10, 30);
+        plainMsgTxtArea.setEditable(false);
+
+        encryptedMsgTxtArea = new JTextArea(10, 30);
+        encryptedMsgTxtArea.setEditable(false);
+
+        scrollablePlainMsgTxtArea = new JScrollPane(plainMsgTxtArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollableEncryptedMsgTxtArea = new JScrollPane(encryptedMsgTxtArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        headingPnl.add(headingLbl);
+        plainTextPnl.add(scrollablePlainMsgTxtArea);
+        encryptedTextPnl.add(scrollableEncryptedMsgTxtArea);
+        mainPnl.add(headingPnl, BorderLayout.NORTH);
+        mainPnl.add(plainTextPnl, BorderLayout.WEST);
+        mainPnl.add(encryptedTextPnl, BorderLayout.EAST);
+        setJMenuBar(menuBar);
+
+        add(mainPnl);
+
+        pack();
+        setResizable(false);
+        setVisible(true);
+
+    }
+
+    private class OpenFileMenuItemListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            JFileChooser chooser = new JFileChooser();
+            int result = chooser.showOpenDialog(SecureMessagesFrame.this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = chooser.getSelectedFile();
+                plainMsgTxtArea.setText("");
+
+                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        plainMsgTxtArea.append(line + "\n");
+                    }
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(SecureMessagesFrame.this,
+                            "Error reading file: " + e.getMessage());
+                }
+            }
+        }
+
+    }
+
+    private class EncryptFileMenuItemListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            String plainText = plainMsgTxtArea.getText().trim();
+            if (plainText.isEmpty()) {
+                JOptionPane.showMessageDialog(SecureMessagesFrame.this, "No text to encrypt!");
+                return;
+            }
+
+            Message msg = new Message();
+            String encrypted = msg.encrypt(plainText);
+            encryptedMsgTxtArea.setText(encrypted);
+        }
+
+    }
+
+    private class SaveEncryptedFileMenuItemListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            JFileChooser chooser = new JFileChooser();
+            int result = chooser.showSaveDialog(SecureMessagesFrame.this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = chooser.getSelectedFile();
+                try (FileWriter writer = new FileWriter(file)) {
+                    writer.write(encryptedMsgTxtArea.getText());
+                    JOptionPane.showMessageDialog(SecureMessagesFrame.this, "Encrypted message saved successfully!");
+                } catch (IOException ex) {
+
+                    JOptionPane.showMessageDialog(SecureMessagesFrame.this, "Error  
+        saving file
+                
+            
+        
+    
+
+    : " + ex.getMessage());  
+      } 
+    } 
+  } 
+} 
+ 
+private class ClearFileMenuItemListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            plainMsgTxtArea.setText("");
+            encryptedMsgTxtArea.setText("");
+        }
+    }
+
+    private class ExitFileMenuItemListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            System.exit(0);
+        }
+
+    }
+
+}
+
+// MessageEncryptor Class  
+
+
+package za.ac.tut.ui; public class Message {
+
+    private int shift;
+
+    public Message(int shift) {
+        this.shift = shift;
+    }
+
+    public Message() {
+        this.shift = 3;
+    }
+
+    public String encrypt(String input) {
+        input = input.toLowerCase();
+        String encrypted = "";
+
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (c >= 'a' && c <= 'z') {
+                encrypted += (char) (((c - 'a' + shift) % 26) + 'a');
+            } else {
+                encrypted += c;
+            }
+        }
+        return encrypted;
+    }
+
+}
+
+
+
+//encryptor
+
+package za.ac.tut.encryption;
+
+public class MessageEncryptor {
+    
+    
+      private static final int SHIFT = 3;
+
+    public static String encrypt(String message) {
+        StringBuilder encryptedMessage = new StringBuilder();
+        for (char i : message.toCharArray()) {
+            if (Character.isLetter(i)) {
+                char base = Character.isUpperCase(i) ? 'A' : 'a';
+                encryptedMessage.append((char) ((i - base + SHIFT) % 26 + base));
+            } else {
+                encryptedMessage.append(i);
+            }
+        }
+        return encryptedMessage.toString();
+    }
+    
+    
+}

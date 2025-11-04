@@ -1,0 +1,71 @@
+public class BankingFlow {
+    private static String createdAccount = "No"; 
+    private static boolean canTransact = false;
+
+    public static void main(String[] args) {
+        Thread accountCreation = new AccountCreationThread();
+        Thread verification = new VerificationThread();
+        Thread transaction = new TransactionThread();
+
+        accountCreation.start();
+        verification.start();
+        transaction.start();
+    }
+    
+    // AccountCreationThread (Provided and corrected)
+    static class AccountCreationThread extends Thread { 
+        @Override
+        public void run() {
+            synchronized (BankingFlow.class) {
+                System.out.println("Creating account...");
+                createdAccount = "Yes"; 
+                System.out.println("Account created.");
+                BankingFlow.class.notifyAll();
+            }
+        }
+    }
+    
+    // VerificationThread (COMPLETED)
+    static class VerificationThread extends Thread {
+        @Override
+        public void run() {
+            synchronized (BankingFlow.class) { // Acquire the monitor lock
+                // Wait until the account is created
+                while (!createdAccount.equals("Yes")) {
+                    try {
+                        System.out.println("Verification Thread: Waiting for account creation...");
+                        BankingFlow.class.wait(); // Release lock and wait
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                
+                // Account created, proceed with verification
+                System.out.println("Verifying account...");
+                canTransact = true; // Set the flag for the TransactionThread
+                System.out.println("Account verified!");
+                
+                // Notify waiting threads (specifically TransactionThread)
+                BankingFlow.class.notifyAll(); 
+            }
+        }
+    }
+    
+    // TransactionThread (Provided and corrected)
+    static class TransactionThread extends Thread { 
+        @Override
+        public void run() {
+            synchronized (BankingFlow.class) {
+                while (!canTransact) {
+                    try {
+                        BankingFlow.class.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace(); 
+                    }
+                }
+                System.out.println("Performing transaction...");
+                System.out.println("Transaction successful!");
+            }
+        }
+    }
+}

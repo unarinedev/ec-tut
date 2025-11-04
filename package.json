@@ -1,0 +1,11 @@
+{
+  "name": "ec-use",
+  "version": "1.0.0",
+  "description": "EC Use Application",
+  "scripts": {
+    "start": "serve -s ."
+  },
+  "dependencies": {
+    "serve": "^14.2.0"
+  }
+}

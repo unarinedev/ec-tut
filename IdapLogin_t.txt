@@ -1,0 +1,303 @@
+I've added spacing (a newline between each question-answer pair) to the provided text without changing any of the functionality or content.
+
+---
+
+in a one-to-many relationship, where is the foreign key placed>In the **secondary table**.
+
+primary role of the **DriverManager** class in JDBC>It **loads database drivers** and **manages database connections**.
+
+process the results of a database query>**ResultSet**
+
+**ResultSet** interface in JDBC is true> It is used to **store and manipulate the results of a query**.
+
+a **thread** in Java> A thread is a **single sequence of executable statements**.
+
+primary advantage of using threads in Java>**Threads allow multiple tasks to be performed concurrently**.
+
+true about **thread scheduling** in Java>The **CPU alternates between threads by time slicing**.
+
+when the **Thread.sleep()** method is called in a Java thread>The thread **yields the CPU to other threads for a specified period of time**.
+
+thread be created in Java>**By extending the Thread class or implementing the Runnable interface**.
+
+the purpose of the **synchronized** keyword in Java threads>**It prevents multiple threads from accessing a shared resource simultaneously**.
+
+default priority of a thread>**Thread.NORM\_PRIORITY**
+
+describes the **time slicing** scheduling technique in threads>Each thread gets an equal slice of CPU time in a **round-robin fashion**.
+
+**run()** method in a Java thread responsible for>**Defining the entry point for a thread’s execution**.
+
+the **sleep()** and **yield()** methods in Java threads>**sleep() pauses the thread for a set period, while yield() allows the thread to be preempted immediately**.
+
+true about **thread priorities** in Java>**Thread priorities are used to influence the order in which threads are scheduled**.
+
+example of **thread synchronization**>**Using the synchronized keyword to control access to shared resources**.
+
+explains the use of the **Runnable interface** in Java>It is an interface that must be implemented by any class whose instances are intended to be executed by a thread.
+
+when a thread completes execution of its **run()** method>It enters the **Terminated** state.
+
+describes **thread synchronization**>Allowing **only one thread at a time** to access a shared resource.
+
+order of thread execution unpredictable>The **thread scheduler** decides which thread runs at any given time
+
+regarding the **Runnable interface**> It defines a single method, **run()**, that must be implemented.
+
+If multiple threads attempt to update a shared variable simultaneously without synchronization>**Race condition**.
+
+when the **start()** method is called on a thread that has already terminated>**An IllegalThreadStateException is thrown**.
+
+common disadvantage of using threads>**Difficulty in debugging and potential data inconsistency**.
+
+benefit do GUI applications derive from using threads>they **respond faster to user events** by running background operations concurrently
+
+prioritydemo:Output order is **unpredictable**; priorities only hint to the scheduler.
+
+sharedflag: The second thread may loop indefinitely due to **lack of synchronization**.
+
+waitwithoutlock: Throws **IllegalMonitorStateException** because wait() is called outside a synchronized block.
+
+task chain: Prints all three steps in order, though start order differs.
+
+classlockexample::Prints “Ready acknowledged” after **thread notification**
+
+single notify: **Only one waiting thread resumes**; the other remains blocked
+
+notifybeforewait: Prints “Done” after 100ms because **notify() occurred before wait()**
+
+missingloop>May **hang** if notifyAll() executes before wait() due to missing condition loop.
+
+sharedresource>Counter increments **sequentially 1–6** without interleaving.
+
+sleepinside>T1 and T2 execute **sequentially** because sleep() does not release the lock
+
+cascade>Stages print in **logical order** (12 3).
+
+nosyncflag>May loop indefinitely due to **CPU caching of validated variable**.
+
+classmonitor>Threads execute **one after the other**, not concurrently.
+
+interruptedwait>Prints “**Interrupted during wait**”.
+
+reverseorder>All three steps execute in **correct dependency order** after synchronization.
+
+Best describes the three parts of a 3-tier application::: A **user interface**, a **backend (business logic)**, and **data storage**.
+
+NOT a component provided by Swing::: **ConsoleReader**
+
+You want only one option between "Male" and "Female" to be selectable. Which components should you use together:::: **JRadioButton and ButtonGroup**
+
+Using **JAR libraries** in Java projects is correct::: A JAR library allows **compiled classes to be reused** across different applications.
+
+advantage of using an **inner/anonymous class** for handling button events:::It allows **event-handling code to be placed close to the component** that triggers it.
+
+**random access** (updating a record in the middle of a text file) difficult to implement using plain text files:::Because text files are **sequential**, changes often require rewriting part or all of the file.
+
+Important to **flush or close a writer** (e.g., BufferedWriter, PrintWriter) after writing data::::To ensure all **buffered data is actually written** to the file.
+
+GUI application become **unresponsive** when performing long **file I/O operations** directly in an event handler::: Because the **Event Dispatch Thread (EDT) is blocked**, preventing the GUI from updating.
+
+Benefit of using a **generic interface** instead of separate interfaces for each entity type:::It **avoids code duplication** by allowing reuse for different data types.
+
+following declaration invalid? `List<int> numbers = new ArrayList<>();`:**Generics only work with reference types, not primitives. Use Integer instead of int.**
+
+can’t elements in a **Set** be accessed by index:::Because **Sets do not maintain insertion order** and have **no positional indexing**.
+
+What happens if you insert two different values into a **Map** with the same key:::The **second value replaces the first one** for that key.
+
+**Set** interface is correct:::It **does not allow duplicate elements** and **does not guarantee order**.
+
+can be stored in a Java **array** but not directly in a **collection**:::**Primitive data types** (e.g., int, double)
+
+the statement `super("Music Player — v2");` does::: It **calls the constructor of the superclass JFrame with the title string**, which sets the window title to “Music Player — v2”.
+
+the **playlistArea wrapped in a JScrollPane**:::: It allows **scrollbars to appear** when the text in the playlist exceeds the visible space.
+
+**JTextField** and **JTextArea**:::: **JTextField is for a single line** of text input, while **JTextArea can display or edit multiple lines** of text.
+
+**setEditable(false)** on the playlist area achieve::: **It makes the text area read-only** so the user cannot type directly into it.
+
+if the radio buttons were not added to the **ButtonGroup**:::: **Both Pop and Rock could be selected at the same time**, which is not the intended behavior.
+
+What is the purpose of the **favCheck checkbox**:::: It lets the user **mark a song as a favourite**. If selected, the playlist entry includes “(Favourite)”.
+
+GUI’s appearance change if **BorderLayout was replaced with FlowLayout** at the frame level:::: **All components would be placed in a single row** (or wrapped rows) with no clear separation into regions.
+
+the frame call **pack() before setVisible(true)**:::: **pack() sizes the window to fit the preferred sizes of its components** neatly before showing it.
+
+If the `playlistArea.setEditable(true);` line was used instead, how would the behavior change:::The **user could type directly into the playlist area**, which may interfere with program-generated entries.
+
+if the `setLocationRelativeTo(null);` line was removed::: The window would still open, but **not centered**—it would appear at the platform’s default location (often top-left).
+
+if the code did not include `songField.requestFocus();` after clearing the input fields?:::: The **user would have to manually click back into the song field** to type again, reducing usability.
+
+if I wanted to add a third genre (e.g., Jazz). Explain what changes would be needed in the code::: **Create a new JRadioButton (”Jazz”)**, **add it to the genre panel** for display, and **add it to the ButtonGroup** for mutual exclusivity.
+
+The primary difference between **DDL** and **DML** is that **DDL defines the structure of the database** while **DML manipulates the data within it**.
+
+When designing tables, it is recommended to allocate **compound fields to their own tables** to achieve **database normalization** and reduce redundancy.
+
+The SQL statement **CREATE TABLE Students (...)** represents **DDL** as it defines a new table structure.
+
+he **java.sql** package contains the classes and interfaces for JDBC.
+
+n JDBC, a **driver** is a software component that enables **communication between Java applications and a database**.
+
+In JDBC, the core classes and interfaces are located in the **java.sql** package.
+
+When creating a table in NetBeans using Java DB, you must **connect to the database server instance on port 1527** before data can be added.
+
+The "**Grab Structure**" option in NetBeans allows you to **save the table schema (structure) to a local file**.
+
+The role of the **PreparedStatement** interface in JDBC is that it allows **parameterized queries to prevent SQL injection**.
+
+**1.26 Referential Integrity via Foreign Key constraints** prevents the inconsistency where a record in the Students table is deleted but its related address still exists in the Address table.
+
+When an SQL **UPDATE** command through JDBC modifies **no rows** but **no exceptions** occur, the best first step in debugging is to **verify the WHERE clause condition and check autocommit status**.
+
+The statement `s.executeQuery("DELETE FROM StudentsTBL WHERE StudentNo = 222");` will fail because **executeQuery() is intended for SELECT statements; executeUpdate() should be used**
+
+When a program executes `PreparedStatement ps = con.prepareStatement(...)` inside a loop with no calls to `ps.close()` or `con.close()`, the most likely long-term issue is **memory and connection leaks leading to "Too many open cursors" errors**.
+
+If records were inserted into **Address before Student** (where Student table's primary key is an integer that autoincrements, and Address table uses that same value as a foreign key), it will **violate referential integrity and cause an SQL constraint error**.
+
+one advantage of using **Swing over AWT** for creating GUI programs::**Swing components allow for platform-independent GUIs**.
+
+key difference between **heavyweight** and **lightweight** components in Java:::**Lightweight components are drawn and rendered entirely by Java code**.
+
+In the Model-View-Controller (**MVC**) architecture, what is the role of the "**model**" in a Swing component::::To **define the internal state** of the component
+
+in the MVC architecture when a user clicks a button in a Swing application::::The **controller updates the model, which then triggers the view to update**.
+
+event is generated when a user clicks a JButton?**KeyEvent**
+
+main purpose of a **Container** in Java's GUI programming?To **hold and organize components**
+
+type of component should be used to allow users to select **one and only one** payment option from a set of choices>**JRadioButton**
+
+important consideration when designing a GUI to improve user experience:::**Minimizing the number of input devices and simplifying complexity**.
+
+the purpose of **JScrollPane** in Swing? To **manage the viewing and scrolling of a scrollable component**
+
+Swing component would you use to provide **input fields** in a form::**JTextField**
+
+In Java, the role of **input and output (I/O) streams** is to **handle connections between a program and files**. The necessary package to import for performing I/O operations in Java is **java.io**
+
+The class that provides methods for **outputting various primitive data types as text** and supports internationalized I/O is **PrintWriter**. When writing a line of characters to a text file, the **println()** method appends an end-of-line character to the line.
+
+The purpose of the **end-of-file character** in a text file is to **mark the end of the file**. The Java method that reads characters from a text file until an end-of-line or end-of-file character is encountered is **BufferedReader.readLine()**.
+
+The class in Java that provides methods to represent **file and directory information** in a platform-independent manner is the **File** class.
+
+An **absolute path name** in file systems is a path that **starts at the root directory of the file system**.
+
+The method used to check if a file is **writable** is **canWrite()**. If the `isWritableFile` method handles a file with an **empty name**, it throws an **IOException** with a message about the invalid file name.
+
+The primary benefit of using **generics** in Java is to **reduce code repetition and increase code reusability**.
+
+When using a **generic interface**, the method signature uses the type parameter **T** in its signatures.
+
+The primary difference between **basic** and **advanced data structures** is that **basic data structures have a fixed size and can store primitives**, while **advanced data structures can grow dynamically and store only objects**.
+
+The interface that is the **root of the Collection Framework** in Java is **Collection**.
+
+A **Collection** can **change size dynamically** and provides methods for manipulating elements, while an **array has a fixed size** and lacks these methods.
+
+A key feature of the **List** interface in the Collection Framework is that it **allows duplicate elements and maintains the order** in which elements are added
+
+How does a **Collection differ from an array** in Java? A **Collection can change size dynamically** and provides methods for manipulating elements, while an **array has a fixed size** and lacks these methods.
+
+why **software reuse** is important
+**Reduced Development Time** (Reusing existing, tested components significantly shortens the coding and design phases, accelerating the time-to-market for new applications) , **Lower Development Cost** (The need to write and test code is minimized, leading to direct savings in labor costs.)
+
+the **collections framework**.
+The **Java Collections Framework (JCF)** is a powerful and unified architecture for representing and manipulating groups of objects. It provides interfaces, implementations, and algorithms designed to handle common data structures efficiently, serving as the backbone for managing data in most Java applications.
+
+three basic steps that must be followed to write data in a text file? **Open the writing stream. Write data. Close stream.**
+
+**New**>The thread instance is created but **not yet started**.
+
+**Runnable**>The thread is **ready to run and waiting for the CPU scheduler**.When is called.
+
+**Running**>The thread is **currently executing instructions on a CPU core**.When the OS scheduler picks a thread from the Runnable pool.
+
+**Blocked/Waiting**>The thread is **temporarily inactive, waiting for a resource or event** and enter Waiting state when is called.
+
+**Terminated**>The thread has **finished execution and is no longer active**.When the method completes for any of the threads.
+
+thread **priorities** affect execution if changed? Would it override the **wait/notify** logic?
+**Thread priorities would not override the wait()/notifyAll() logic**. a thread in the Waiting state, regardless of high priority, will remain suspended until explicitly woken up.
+
+role of the **main thread** here?
+The main thread's primary role in this program is **initialization and management**. It sets up the execution environment, creates the three worker threads
+
+Difference from Worker Threads: The main thread executes the `main(String[] args)` method sequentially, while the worker threads execute the code in their respective `run()` methods **concurrently** (or seemingly at the same time) and **independently** from the main thread's completion.
+
+the **run() method essential** in thread execution> The `run()` method is essential because it is the **entry point for the code executed by the thread**.
+
+**synchronization is critical** in this scenario>Synchronization is critical because the **threads share mutable state** (`createdAccount` and `canTransact`), making the system vulnerable to **race conditions and data inconsistency**.
+
+**wait() and notifyAll() enforce sequential execution**>The `wait()` and `notifyAll()` methods enforce sequential execution by creating a reliable **chain of dependencies** based on shared state
+
+Class to **read character data** from a file>**FileReader**
+
+Purpose of **flush()** method>To **write buffered data** to the destination
+
+Class for writing **formatted text** to a file>**PrintWriter**
+
+Result of trying to read a **non-existent file**>**FileNotFoundException** is thrown
+
+Method to check if a **file exists**>**file.exists()**
+
+Difference between **FileWriter** and **BufferedWriter**>**BufferedWriter provides buffering for efficient writing**
+
+Stream class used to read **binary data**>**FileInputStream**
+
+What the **close()** method does in file streams>**Flushes and closes the stream**
+
+Exception that must be handled with file streams>**IOException**
+
+Role of **try-with-resources** in file handling>**It automatically closes resources**
+
+Swing component for a **drop-down list**>**JComboBox**
+
+Role of **repaint()** in Swing>B. It **updates the UI by redrawing components**
+
+True statement about **BufferedReader and JTextArea**>**JTextArea can be used to display file content read by BufferedReader**
+
+Correct way to read a file and display its content in a **JTextArea**>**Use FileReader and append to JTextArea**
+
+Best combination for **reading a file and updating a GUI**>B. **BufferedReader + JTextArea**
+
+Best practice when **updating a Swing component from a file stream**> A. Use a **separate thread to avoid blocking the UI**
+
+What the **accept()** method does in a **ServerSocket**> **Waits for a client to connect and returns a Socket**
+
+Risk of no synchronization when a **server handles multiple clients with threads**>**Data inconsistency due to race conditions**
+
+Purpose of **setSoTimeout(int timeout)** on a socket>**Specifies the timeout for read operations**
+
+Stream used to read data from a socket>**InputStream**
+
+Result when a **client connects but the server is not running**> **Client throws a connection exception**
+
+Method used to **send data to a server from a client**> **getOutputStream().write()**
+
+Role of **multithreading** in a server application>To **handle multiple client requests concurrently**
+
+Purpose of the **InetAddress.getLocalHost()** method> **Returns the IP address of the local machine**
+
+What `BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));` achieves> **Reads data from the socket input stream**
+
+Class used for handling **UDP packets** in Java>**DatagramPacket**
+
+What `PrintWriter out = new PrintWriter(socket.getOutputStream(), true);` does>**Sends formatted text to the socket output stream**
+
+Role of **DatagramPacket** in Java networking>To **encapsulate data for UDP transmission**
+
+Method used to **bind a ServerSocket to a specific port**> D. **ServerSocket(int port)**
+
+What `InetAddress address = InetAddress.getByName("www.example.com");` does> B. **Resolves the domain name to an IP address**
+
+Function of **getPort()** in a **Socket object**> B. **Returns the remote port number**

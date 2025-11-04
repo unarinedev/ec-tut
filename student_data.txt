@@ -1,0 +1,522 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class DBTest {
+    public static void main(String[] args) {
+        // Database URL for DerbyDB (JavaDB)
+        String dbURL = "jdbc:derby://localhost:1527/Sales";
+        
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            // Establish connection to the database
+            conn = DriverManager.getConnection(dbURL);
+            stmt = conn.createStatement();
+
+            boolean running = true;
+
+            while (running) {
+                // Display menu
+                System.out.println("Menu:");
+                System.out.println("1. Display all car makes");
+                System.out.println("2. Find oldest model");
+                System.out.println("3. Total value of all cars");
+                System.out.println("4. Most expensive car");
+                System.out.println("5. Least expensive car");
+                System.out.println("6. Exit");
+                System.out.print("Choose an option: ");
+                int choice = scanner.nextInt();
+
+                // Execute the common query to retrieve all cars
+                rs = stmt.executeQuery("SELECT * FROM CARS");
+
+                switch (choice) {
+                    case 1:
+                        displayAllCarMakes(rs);
+                        break;
+                    case 2:
+                        findOldestModel(rs);
+                        break;
+                    case 3:
+                        calculateTotalValue(rs);
+                        break;
+                    case 4:
+                        findMostExpensiveCar(rs);
+                        break;
+                    case 5:
+                        findLeastExpensiveCar(rs);
+                        break;
+                    case 6:
+                        running = false;
+                        System.out.println("Exiting...");
+                        break;
+                    default:
+                        System.out.println("Invalid option. Please choose a valid option.");
+                        break;
+                }
+                System.out.println();
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            // Close resources
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        scanner.close();
+    }
+
+    // Display all car makes
+    private static void displayAllCarMakes(ResultSet rs) throws SQLException {
+        System.out.println("List of Car Makes:");
+        while (rs.next()) {
+            String make = rs.getString("make");
+            System.out.println(make);
+        }
+    }
+
+    // Find the oldest car model
+    private static void findOldestModel(ResultSet rs) throws SQLException {
+        int oldestYear = Integer.MAX_VALUE;
+        String oldestCar = "";
+
+        while (rs.next()) {
+            int year = rs.getInt("manufacture_year");
+            if (year < oldestYear) {
+                oldestYear = year;
+                oldestCar = rs.getString("make") + " " + rs.getString("model");
+            }
+        }
+
+        System.out.println("Oldest Car: " + oldestCar + " (" + oldestYear + ")");
+    }
+
+    // Calculate the total value of all cars
+    private static void calculateTotalValue(ResultSet rs) throws SQLException {
+        double totalValue = 0;
+
+        while (rs.next()) {
+            totalValue += rs.getDouble("price");
+        }
+
+        System.out.println("Total value of all cars: R" + totalValue);
+    }
+
+    // Find the most expensive car
+    private static void findMostExpensiveCar(ResultSet rs) throws SQLException {
+        double maxPrice = Double.MIN_VALUE;
+        String expensiveCar = "";
+
+        while (rs.next()) {
+            double price = rs.getDouble("price");
+            if (price > maxPrice) {
+                maxPrice = price;
+                expensiveCar = rs.getString("make") + " " + rs.getString("model");
+            }
+        }
+
+        System.out.println("Most Expensive Car: " + expensiveCar + " (R" + maxPrice + ")");
+    }
+
+    // Find the least expensive car
+    private static void findLeastExpensiveCar(ResultSet rs) throws SQLException {
+        double minPrice = Double.MAX_VALUE;
+        String cheapCar = "";
+
+        while (rs.next()) {
+            double price = rs.getDouble("price");
+            if (price < minPrice) {
+                minPrice = price;
+                cheapCar = rs.getString("make") + " " + rs.getString("model");
+            }
+        }
+
+        System.out.println("Least Expensive Car: " + cheapCar + " (R" + minPrice + ")");
+    }
+}
+
+
+//application 2
+
+//entity model
+
+package za;
+
+
+public class Student {
+    private Integer studNum;
+    private String name;
+    private String surname;
+   
+
+    public Student(){
+
+    }
+
+    public Student(Integer studNum, String name, String surname){
+        this.studNum=studNum;
+        this.name=name;
+        this.surname=surname;
+}
+
+    public Integer getStudNum() {
+        return studNum;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setStudNum(Integer studNum) {
+        this.studNum = studNum;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+ @Override
+public String toString(){
+    return studNum +", "+name+", "+ surname;
+} 
+}
+
+//interface
+
+interface
+Package za;
+
+import java.util.List;
+
+public interface DOA<T> {
+    T get(Integer code); //(similar to Book myBook=bookDAO.get(102)
+    List<T> getAll();
+    boolean add(T t);
+    boolean update(T t);
+    boolean delete(T t);
+}
+
+
+
+//studentDB
+
+//step 3
+package za;
+
+//1 importing
+import java.sql.Connection;
+import java.sql.DriverManager;
+import static java.sql.DriverManager.getConnection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import za.Student;
+
+
+//2 implement the interface
+public class StudentDB implements DOA<Student> { //implementation of the DOA interface. It specifies Student as the generic type <T>, which means this class will handle Student objects.
+    
+ //2.1 create connection to the database  
+    private Connection connection; //This declares a private field to hold the database connection. This object is crucial for communicating with the database.
+
+public StudentDB(String dbURL, String username, String password) throws SQLException{ //This is the constructor. It takes the database URL, username, and password as arguments and uses them to establish a connection to the database. The throws SQLException part means the constructor can throw a SQLException if the connection fails.
+connection=getConnection(dbURL, username, password); //this line calls a private helper method (getConnection) to create the database connection and assigns it to the connection field.
+    }
+
+//2.2 override
+@Override
+public Student get(Integer code) { //This defines the SQL query. The ? is a placeholder that will be replaced with the actual student number. Using a prepared statement with a placeholder prevents SQL injection attacks.
+    String sql = "SELECT StudentNumber, Name, Surname " +
+                 "FROM StudentsTBL " +
+                 "WHERE StudentNumber =?"; 
+    
+    try {
+        PreparedStatement ps = connection.prepareStatement(sql); //prepare the statement // by sending it to the database for execution and store under the ps variable as an object
+        ps.setInt(1, code); //binds value from data base to variable/placeholder  //use the PreparedStatement object (ps) to set an integer value (.setInt()) (1 > This is the parameter index. It tells the method to replace the first question mark (?) in your SQL query with a value.) (code > This is the value you want to use. It's the Integer code you passed to your method, which holds the unique student number.)
+        ResultSet rs = ps.executeQuery(); //execute the statement 
+        
+     
+        
+        
+        //so it only be the unique identifier?
+        /*
+        
+        */
+        
+        if (rs.next()) {
+            Integer studNum = rs.getInt("StudentNumber");
+            String name = rs.getString("Name");
+            String surname = rs.getString("Surname");
+            Student student = new Student(studNum, name, surname);
+            rs.close();
+            return student;
+        } else {
+            rs.close();
+            return null;
+        }
+    } catch (SQLException ex) {
+        System.err.println(ex);
+        return null;
+    }
+}
+
+@Override
+public boolean add(Student t) {
+    String sql = "INSERT INTO StudentsTBL (StudentNumber, Name, Surname) " +
+                 "VALUES (?, ?, ?)";
+
+    try {
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ps.setInt(1, t.getStudNum());
+        ps.setString(2, t.getName());
+        ps.setString(3, t.getSurname());
+        ps.executeUpdate();
+        return true;
+    } catch (SQLException ex) {
+        System.err.println(ex);
+        return false;
+    }
+}
+
+@Override
+public List<Student> getAll() {
+    String sql = "SELECT * FROM StudentsTBL " +
+                 "ORDER BY StudentNumber ASC";
+    List<Student> students = new ArrayList<>();
+    
+    try {
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        
+        while (rs.next()) {
+            Integer studNum = rs.getInt("StudentNumber");
+            String name = rs.getString("Name");
+            String surname = rs.getString("Surname");
+            Student student = new Student(studNum, name, surname);
+            students.add(student);
+        }
+        
+        return students;
+    } catch (SQLException ex) {
+        System.err.println(ex);
+        return null;
+    }
+}
+
+@Override
+public boolean delete(Student t) {
+    String sql = "DELETE FROM StudentsTBL " +
+                 "WHERE StudentNumber =?";
+    
+    try {
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ps.setInt(1, t.getStudNum());
+        ps.executeUpdate();
+        return true;
+    } catch (SQLException ex) {
+        System.err.println(ex);
+        return false;
+    }
+}
+
+@Override
+public boolean update(Student t) {
+    String sql = "UPDATE StudentsTBL SET " +
+                 "Name = ?, " +
+                 "Surname = ? " +
+                 "WHERE StudentNumber =?";
+    
+    try {
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ps.setString(1, t.getName());
+        ps.setString(2, t.getSurname());
+        ps.setInt(3, t.getStudNum());
+        ps.executeUpdate();
+        return true;
+    } catch (SQLException ex) {
+        System.err.println(ex);
+        return false;
+    }
+}
+
+//get connection 
+private Connection getConnection(String dbURL, String username, String password) throws SQLException {
+    Connection theConnection = DriverManager.getConnection(dbURL, username, password);
+    return theConnection;
+} 
+}
+
+//APP
+package doaapp;
+
+import za.Student;
+import za.StudentDB;
+import java.sql.SQLException;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Scanner;
+public class DOAAPP {
+
+  
+    public static void main(String[] args) {
+             // Replace these with your actual database URL, username, and password
+        String dbURL = "jdbc:derby://localhost:1527/StudentsDB";
+        String username = "app";
+        String password = "12345";
+
+       try (Scanner scanner = new Scanner(System.in)) {
+            StudentDB studentDB = new StudentDB(dbURL, username, password);
+            System.out.println("Connected to the database successfully.");
+
+            int choice = 0;
+            while (choice != 6) {
+                printMenu();
+                try {
+                    System.out.print("Your choice: ");
+                    choice = scanner.nextInt();
+                    scanner.nextLine(); // Consume the newline character
+
+                    switch (choice) {
+                        case 1:
+                            addStudent(studentDB, scanner);
+                            break;
+                        case 2:
+                            deleteStudent(studentDB, scanner);
+                            break;
+                        case 3:
+                            updateStudent(studentDB, scanner);
+                            break;
+                        case 4:
+                            getStudent(studentDB, scanner);
+                            break;
+                        case 5:
+                            getAllStudents(studentDB);
+                            break;
+                        case 6:
+                            System.out.println("Exiting application. Goodbye!");
+                            break;
+                        default:
+                            System.out.println("Invalid choice. Please try again.");
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Please enter a number.");
+                    scanner.nextLine(); // Clear the invalid input from the scanner
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database connection failed: " + e.getMessage());
+        }
+    }
+
+    private static void printMenu() {
+        System.out.println("\n--- Please select one of the following options: ---");
+        System.out.println("1 - add student");
+        System.out.println("2 - delete student");
+        System.out.println("3 - update student");
+        System.out.println("4 - get student");
+        System.out.println("5 - get all students");
+        System.out.println("6 - exit");
+    }
+
+    private static void addStudent(StudentDB studentDB, Scanner scanner) {
+        System.out.println("--- Add Student ---");
+        System.out.print("Enter Student Number: ");
+        int studNum = scanner.nextInt();
+        scanner.nextLine();
+        System.out.print("Enter Name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter Surname: ");
+        String surname = scanner.nextLine();
+
+        Student newStudent = new Student(studNum, name, surname);
+        if (studentDB.add(newStudent)) {
+            System.out.println("Student added successfully.");
+        } else {
+            System.out.println("Failed to add student. It might already exist.");
+        }
+    }
+
+    private static void deleteStudent(StudentDB studentDB, Scanner scanner) {
+        System.out.println("--- Delete Student ---");
+        System.out.print("Enter Student Number to delete: ");
+        int studNum = scanner.nextInt();  
+        scanner.nextLine();
+
+        Student studentToDelete = new Student(studNum, "", ""); // Name and surname are not needed for deletion
+        if (studentDB.delete(studentToDelete)) {
+            System.out.println("Student deleted successfully.");
+        } else {
+            System.out.println("Failed to delete student. Student may not exist.");
+        }
+    }
+
+    private static void updateStudent(StudentDB studentDB, Scanner scanner) {
+        System.out.println("--- Update Student ---");
+        System.out.print("Enter Student Number to update: ");
+        int studNum = scanner.nextInt();
+        scanner.nextLine();
+        System.out.print("Enter new Name: ");
+        String newName = scanner.nextLine();
+        System.out.print("Enter new Surname: ");
+        String newSurname = scanner.nextLine();
+
+        Student studentToUpdate = new Student(studNum, newName, newSurname);
+        if (studentDB.update(studentToUpdate)) {
+            System.out.println("Student updated successfully.");
+        } else {
+            System.out.println("Failed to update student. Student may not exist.");
+        }
+    }
+
+    private static void getStudent(StudentDB studentDB, Scanner scanner) {
+        System.out.println("--- Get Student ---");
+        System.out.print("Enter Student Number to retrieve: ");
+        int studNum = scanner.nextInt();
+        scanner.nextLine();
+
+        Student foundStudent = studentDB.get(studNum);
+        if (foundStudent != null) {
+            System.out.println("Found student: " + foundStudent);
+        } else {
+            System.out.println("Student with number " + studNum + " not found.");
+        }
+    }
+
+    private static void getAllStudents(StudentDB studentDB) {
+        System.out.println("--- All Students ---");
+        List<Student> allStudents = studentDB.getAll();
+        if (allStudents != null && !allStudents.isEmpty()) {
+            for (Student student : allStudents) {
+                System.out.println(student);
+            }
+        } else {
+            System.out.println("No students found in the database or failed to retrieve.");
+        }
+    }
+    
+}
+

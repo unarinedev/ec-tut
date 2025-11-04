@@ -1,0 +1,621 @@
+package gymmembershipframe;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+public class GymMembershipFrame extends JFrame {
+    
+    // --- Panels ---
+    private final JPanel headingPnl;
+    private final JPanel clientPnl;
+    private final JPanel btnsPnl;
+    private final JPanel mainPnl;
+
+    // --- Labels ---
+    private final JLabel headingLbl;
+    private final JLabel fahrenheitLbl; 
+
+    // --- Text Fields ---
+    private final JTextField nameTxtFld;
+    private final JTextField surnameTxtFld;
+    private final JTextField idNoTxtFld;
+    
+    // --- Converter Components ---
+    private final JTextField celsiusTxtFld;
+    private final JSlider celsiusSlider;
+    private final JButton resetBtn;
+
+    // --- Menu Bar ---
+    private final JMenuBar menuBar;
+
+    // --- Combo Box ---
+    private final JComboBox<String> genderComboBox; // Use generics for type safety
+
+    // --- Radio Buttons ---
+    private final JRadioButton monthToMonthRadBtn;
+    private final JRadioButton sixMonthsRadBtn;
+    private final JRadioButton annualRadBtn;
+
+    // --- Check Box ---
+    private final JCheckBox personalTrainerChkBx;
+
+    // --- Button Group ---
+    private final ButtonGroup btnGrp;
+
+    // --- Text Area / Scroll Pane ---
+    private final JTextArea commentsArea;
+    private final JScrollPane scrollableTxtArea;
+
+    // --- Buttons ---
+    private final JButton registerBtn;
+    private final JButton displayBtn;
+    private final JButton clearBtn;
+    private final JButton exitBtn;
+
+    public GymMembershipFrame() {
+        setTitle("Gym Membership");
+        setResizable(false); 
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        // create fonts
+        Font headingFont = new Font("SansSerif", Font.BOLD, 20);
+        Font normalFont = new Font("SansSerif", Font.PLAIN, 12);
+
+        // --- MENU BAR SETUP ---
+        menuBar = new JMenuBar();
+        JMenu menuFile = new JMenu("File");
+        JMenu menuEdit = new JMenu("Edit");
+
+        JMenuItem miSave = new JMenuItem("Save Members Display");
+        miSave.addActionListener((e) -> saveDisplayToFile()); 
+        JMenuItem miOpen = new JMenuItem("Open Members File");
+        miOpen.addActionListener((e) -> loadDisplayFromFile()); 
+        JMenuItem miExit = new JMenuItem("Exit App");
+        miExit.addActionListener((e) -> closeApp());
+        
+        JMenuItem miUpdate = new JMenuItem("Update Member (ID)");
+        miUpdate.addActionListener((e) -> updateMember());
+        JMenuItem miDelete = new JMenuItem("Delete Member (ID)");
+        miDelete.addActionListener((e) -> deleteMember());
+
+        menuFile.add(miSave);
+        menuFile.add(miOpen);
+        menuFile.addSeparator();
+        menuFile.add(miExit);
+        menuEdit.add(miUpdate);
+        menuEdit.add(miDelete);
+        
+        menuBar.add(menuFile);
+        menuBar.add(menuEdit);
+        setJMenuBar(menuBar);
+        // --- END MENU BAR SETUP ---
+
+        // create panels
+        headingPnl = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        clientPnl = new JPanel(new GridLayout(4, 1, 2, 2));
+        JPanel namePnl = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel surnamePnl = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel idNoPnl = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel genderPnl = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel contractsPnl = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel personalTrainerOptionPnl = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel membershipPnl = new JPanel(new GridLayout(2, 1, 2, 2));
+        JPanel commentsPnl = new JPanel(new FlowLayout());
+        btnsPnl = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel headingClientCombinedPnl = new JPanel(new BorderLayout());
+        JPanel membershipCommentsCombinedPnl = new JPanel(new BorderLayout());
+        mainPnl = new JPanel(new BorderLayout(10, 10));
+
+        // create labels
+        headingLbl = new JLabel("Gym Membership");
+        headingLbl.setFont(headingFont);
+        headingLbl.setForeground(Color.BLUE);
+        headingLbl.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
+        JLabel nameLbl = new JLabel("Name:   ");
+        nameLbl.setFont(normalFont);
+        JLabel surnameLbl = new JLabel("Surname:");
+        JLabel idNoLbl = new JLabel("ID No:");
+        JLabel genderLbl = new JLabel("Gender:");
+        JLabel contractTypeLbl = new JLabel("Contract: ");
+        JLabel personalTrainerLbl = new JLabel("Select this checkbox if you need a personal trainer:");
+
+        // create textfields
+        nameTxtFld = new JTextField(10);
+        surnameTxtFld = new JTextField(10);
+        idNoTxtFld = new JTextField(10);
+        
+        // initialize fahrenheitLbl
+        fahrenheitLbl = new JLabel("Fahrenheit (°F): 32.0"); 
+        fahrenheitLbl.setFont(normalFont);
+        fahrenheitLbl.setForeground(Color.DARK_GRAY);
+        fahrenheitLbl.setHorizontalAlignment(JLabel.CENTER);
+
+        // create combobox
+        genderComboBox = new JComboBox<>();
+        genderComboBox.addItem("Male");
+        genderComboBox.addItem("Female");
+
+        // create radio buttons
+        monthToMonthRadBtn = new JRadioButton("Month-to-month");
+        sixMonthsRadBtn = new JRadioButton("Six-months");
+        annualRadBtn = new JRadioButton("Annual");
+
+        // create checkbox
+        personalTrainerChkBx = new JCheckBox();
+
+        // create button group
+        btnGrp = new ButtonGroup();
+        btnGrp.add(monthToMonthRadBtn);
+        btnGrp.add(sixMonthsRadBtn);
+        btnGrp.add(annualRadBtn);
+
+        // create text area
+        commentsArea = new JTextArea(15, 50);
+        commentsArea.setEditable(false);
+        commentsArea.setBorder(new TitledBorder(new LineBorder(Color.BLACK, 1), "Member(s) details"));
+        scrollableTxtArea = new JScrollPane(commentsArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+        // create buttons
+        registerBtn = new JButton("REGISTER");
+        registerBtn.addActionListener(new RegisterBtnListener());
+        displayBtn = new JButton("DISPLAY MEMBERS");
+        displayBtn.addActionListener((e) -> loadDisplayFromFile()); 
+        clearBtn = new JButton("CLEAR");
+        clearBtn.addActionListener(new ClearBtnListener());
+        exitBtn = new JButton("EXIT");
+        exitBtn.addActionListener(new ExitBtnListener());
+
+        commentsPnl.setBorder(new TitledBorder(new LineBorder(Color.BLACK, 1), "Contract options"));
+
+        // --- Temperature Converter Components ---
+        JPanel converterPnl = new JPanel(new GridLayout(6, 1, 10, 10));
+        converterPnl.setBorder(new TitledBorder(new LineBorder(Color.RED, 2), "Temperature Converter"));
+
+        JLabel celsiusLbl = new JLabel("Celsius (°C) Input:");
+        celsiusLbl.setFont(normalFont);
+
+        celsiusTxtFld = new JTextField("0"); 
+        celsiusTxtFld.setFont(normalFont);
+        celsiusTxtFld.setHorizontalAlignment(JTextField.CENTER);
+        celsiusTxtFld.addActionListener(new CelsiusTextListener());
+        
+        celsiusSlider = new JSlider(JSlider.HORIZONTAL, -50, 50, 0);
+        celsiusSlider.setMajorTickSpacing(25);
+        celsiusSlider.setMinorTickSpacing(5);
+        celsiusSlider.setPaintTicks(true);
+        celsiusSlider.setPaintLabels(true);
+        celsiusSlider.addChangeListener(new CelsiusSliderListener());
+
+        resetBtn = new JButton("Reset Converter");
+        resetBtn.addActionListener(new ResetBtnListener());
+
+        converterPnl.add(celsiusLbl);
+        converterPnl.add(celsiusTxtFld);
+        converterPnl.add(celsiusSlider);
+        converterPnl.add(new JLabel("Converted Value:"));
+        converterPnl.add(fahrenheitLbl);
+        converterPnl.add(resetBtn);
+        // --- END CONVERTER INITIALIZATION ---
+
+        // add components to panels
+        namePnl.add(nameLbl);
+        namePnl.add(nameTxtFld);
+        surnamePnl.add(surnameLbl);
+        surnamePnl.add(surnameTxtFld);
+        idNoPnl.add(idNoLbl);
+        idNoPnl.add(idNoTxtFld);
+        genderPnl.add(genderLbl);
+        genderPnl.add(genderComboBox);
+        clientPnl.add(namePnl);
+        clientPnl.add(surnamePnl);
+        clientPnl.add(idNoPnl);
+        clientPnl.add(genderPnl);
+        
+        headingPnl.add(headingLbl);
+        headingClientCombinedPnl.add(headingPnl, BorderLayout.NORTH);
+        headingClientCombinedPnl.add(clientPnl, BorderLayout.CENTER);
+        
+        contractsPnl.add(contractTypeLbl);
+        contractsPnl.add(monthToMonthRadBtn);
+        contractsPnl.add(sixMonthsRadBtn);
+        contractsPnl.add(annualRadBtn);
+        personalTrainerOptionPnl.add(personalTrainerLbl);
+        personalTrainerOptionPnl.add(personalTrainerChkBx);
+        
+        membershipPnl.add(contractsPnl);
+        membershipPnl.add(personalTrainerOptionPnl);
+        commentsPnl.add(scrollableTxtArea);
+        membershipCommentsCombinedPnl.add(membershipPnl, BorderLayout.NORTH);
+        membershipCommentsCombinedPnl.add(commentsPnl, BorderLayout.CENTER);
+        
+        btnsPnl.add(registerBtn);
+        btnsPnl.add(displayBtn);
+        btnsPnl.add(clearBtn);
+        btnsPnl.add(exitBtn);
+
+        mainPnl.add(headingClientCombinedPnl, BorderLayout.NORTH);
+        mainPnl.add(membershipCommentsCombinedPnl, BorderLayout.CENTER);
+        mainPnl.add(btnsPnl, BorderLayout.SOUTH);
+        mainPnl.add(converterPnl, BorderLayout.EAST);
+
+        
+        add(mainPnl); // adds your main panel to the jframe
+        pack(); // sizes the frame to fit the components
+        setVisible(true);
+    }
+    
+    // --- Core Utility Methods ---
+    
+    // Helper method for converting Celsius to Fahrenheit
+    private void updateFahrenheit(int celsius) {
+        // F = C * 9/5 + 32
+        double fahrenheit = celsius * 1.8 + 32;
+        fahrenheitLbl.setText(String.format("Fahrenheit (°F): %.1f", fahrenheit));
+    }
+
+    // Helper method for clearing fields
+    private void clearFields() {
+        // clear the fields
+        nameTxtFld.setText("");
+        surnameTxtFld.setText("");
+        idNoTxtFld.setText("");
+        personalTrainerChkBx.setSelected(false);
+        btnGrp.clearSelection();
+        commentsArea.setText("");
+
+        // set focus back to the name text field
+        nameTxtFld.requestFocusInWindow();
+    }
+    
+    // --- Menu Action Implementations ---
+
+    // Exits the application
+    private void closeApp(){
+        System.exit(0);
+    }
+
+    // Placeholder for update logic (shows a message box)
+    private void updateMember(){
+        JOptionPane.showMessageDialog(this, 
+            "Update Member logic not fully implemented yet.\n" +
+            "You would typically prompt for the ID and new details here.", 
+            "Feature Pending", 
+            JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    // Placeholder for delete logic (shows a message box)
+    private void deleteMember(){
+        JOptionPane.showMessageDialog(this, 
+            "Delete Member logic not fully implemented yet.\n" +
+            "You would typically prompt for the ID and remove the record from the file.", 
+            "Feature Pending", 
+            JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    // Menu Action: Saves the current content of the commentsArea to a file.
+    private void saveDisplayToFile() {
+        JFileChooser fc = new JFileChooser();
+        int val = fc.showSaveDialog(GymMembershipFrame.this);
+        
+        if (val == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+                bw.write(commentsArea.getText());
+                JOptionPane.showMessageDialog(GymMembershipFrame.this, "Display content saved successfully!");
+            } catch (IOException ex) {
+                Logger.getLogger(GymMembershipFrame.class.getName()).log(Level.SEVERE, "Error saving display to file.", ex);
+                JOptionPane.showMessageDialog(GymMembershipFrame.this, "Error saving file: " + ex.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(GymMembershipFrame.this, "Save operation cancelled.", "Cancelled", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    // Button/Menu Action: Loads content from a file into the commentsArea.
+    private void loadDisplayFromFile() {
+        BufferedReader br;
+        String data;
+        StringBuilder record = new StringBuilder();
+        JFileChooser fc = new JFileChooser();
+        int val = fc.showOpenDialog(GymMembershipFrame.this);
+        File file;
+
+        if (val == JFileChooser.APPROVE_OPTION) {
+            try {
+                file = fc.getSelectedFile();
+                br = new BufferedReader(new FileReader(file));
+
+                // read the file until end of file
+                while ((data = br.readLine()) != null) {
+                    record.append(data).append("\n");
+                }
+                br.close();
+
+                // append the data on the text area
+                commentsArea.setText(record.toString());
+                JOptionPane.showMessageDialog(GymMembershipFrame.this, "Members retrieved and displayed.");
+            } catch (IOException ex) {
+                Logger.getLogger(GymMembershipFrame.class.getName()).log(Level.SEVERE, "Error performing file I/O.", ex);
+                JOptionPane.showMessageDialog(GymMembershipFrame.this, "Error reading file: " + ex.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            commentsArea.setText("Display operation cancelled.");
+        }
+    }
+
+
+    // --- Listener Classes ---
+
+    // Handles the REGISTER button (saves one member to a user-chosen file)
+    private class RegisterBtnListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+
+            // Create variables to hold the data
+            String name, surname, idNo, gender, contractType = null;
+            Boolean isPersonalTrainerSelected;
+            
+            // read data from the fields
+            name = nameTxtFld.getText();
+            surname = surnameTxtFld.getText();
+            idNo = idNoTxtFld.getText();
+            gender = (String) genderComboBox.getSelectedItem();
+            isPersonalTrainerSelected = personalTrainerChkBx.isSelected();
+            
+            // Basic validation to prevent null/empty file entry
+            if (name.isEmpty() || surname.isEmpty() || idNo.isEmpty() || btnGrp.getSelection() == null) {
+                 JOptionPane.showMessageDialog(GymMembershipFrame.this, "Please fill in all client and contract details.", "Missing Information", JOptionPane.WARNING_MESSAGE);
+                 return;
+            }
+
+            // Determine contract type
+            if (sixMonthsRadBtn.isSelected()) {
+                contractType = "Six months";
+            } else if (annualRadBtn.isSelected()) {
+                contractType = "Annual";
+            } else if (monthToMonthRadBtn.isSelected()) {
+                contractType = "Month-to-month";
+            } 
+            
+            // Create the member object (now using the nested class)
+            member newMember = new member(name, surname, idNo, gender, contractType, isPersonalTrainerSelected);
+
+            // create a file chooser
+            JFileChooser fc = new JFileChooser();
+
+            // show the save dialog
+            int val = fc.showSaveDialog(GymMembershipFrame.this);
+
+            if (val == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {
+                    // write data to the file, and then move the cursor to the newline
+                    bw.write(newMember.toString());
+                    bw.newLine();
+
+                    // clear the fields
+                    clearFields();
+
+                    // confirmation dialog
+                    JOptionPane.showMessageDialog(GymMembershipFrame.this, "Member registered successfully!");
+                } catch (IOException ex) {
+                    // Log the error
+                    Logger.getLogger(GymMembershipFrame.class.getName()).log(Level.SEVERE, "Error writing to file.", ex);
+                    JOptionPane.showMessageDialog(GymMembershipFrame.this, "Error writing to file: " + ex.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                // Inform the user if they cancelled the save dialog
+                 JOptionPane.showMessageDialog(GymMembershipFrame.this, "Registration cancelled.", "Cancelled", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }
+    
+    // Handles the CLEAR button
+    private class ClearBtnListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            clearFields();
+        }
+    }
+
+    // Handles the EXIT button
+    private class ExitBtnListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            System.exit(0);
+        }
+    }
+    
+    // Handles the JSlider movement
+    private class CelsiusSliderListener implements ChangeListener {
+        @Override
+        public void stateChanged(ChangeEvent ce) {
+            int celsius = celsiusSlider.getValue();
+            
+            // 1. Update the JTextField
+            celsiusTxtFld.setText(String.valueOf(celsius));
+            
+            // 2. Update the Fahrenheit JLabel
+            updateFahrenheit(celsius);
+        }
+    }
+
+    // Handles the Enter key press in the JTextField
+    private class CelsiusTextListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            try {
+                // 1. Read input from JTextField
+                int celsius = Integer.parseInt(celsiusTxtFld.getText());
+                
+                // 2. Validate the range (-50 to 50)
+                if (celsius < -50 || celsius > 50) {
+                    JOptionPane.showMessageDialog(GymMembershipFrame.this, 
+                        "Please enter a value between -50 and 50 Celsius.", "Input Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                    // Reset text field to current slider value
+                    celsiusTxtFld.setText(String.valueOf(celsiusSlider.getValue()));
+                    return;
+                }
+                
+                // 3. Update the JSlider (which triggers the ChangeListener)
+                celsiusSlider.setValue(celsius);
+                
+            } catch (NumberFormatException e) {
+                 JOptionPane.showMessageDialog(GymMembershipFrame.this, 
+                        "Invalid number format. Please enter an integer.", "Input Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                 // Reset text field to current slider value
+                 celsiusTxtFld.setText(String.valueOf(celsiusSlider.getValue()));
+            }
+        }
+    }
+    
+    // Handles the Reset Button in the converter panel
+    private class ResetBtnListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            // Reset the slider (which triggers listeners to update other components)
+            celsiusSlider.setValue(0);
+        }
+    }
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        new GymMembershipFrame();
+    }
+    
+    // --- NESTED MEMBER CLASS ---
+    /**
+     * Represents a gym member with their personal and contract details.
+     * Defined as a static class inside GymMembershipFrame to keep it in a single file.
+     */
+    public static class member {
+        private String name;
+        private String surname;
+        private String idNo;
+        private String gender;
+        private String contractType;
+        private boolean personalTrainer;
+
+        /**
+         * Constructor for the member class.
+         */
+        public member(String name, String surname, String idNo, String gender, String contractType, boolean personalTrainer) {
+            this.name = name;
+            this.surname = surname;
+            this.idNo = idNo;
+            this.gender = gender;
+            this.contractType = contractType;
+            this.personalTrainer = personalTrainer;
+        }
+
+        /**
+         * Returns a string representation of the member's details, suitable for file output.
+         */
+        @Override
+        public String toString() {
+            String trainerOption = this.personalTrainer ? "Yes" : "No";
+            return String.format(
+                "Name: %s | Surname: %s | ID: %s | Gender: %s | Contract: %s | Personal Trainer: %s",
+                this.name, this.surname, this.idNo, this.gender, this.contractType, trainerOption
+            );
+        }
+
+        // Getters and setters (optional, but good practice for encapsulation)
+        public String getName() { return name; }
+        public String getSurname() { return surname; }
+        public String getIdNo() { return idNo; }
+        public String getGender() { return gender; }
+        public String getContractType() { return contractType; }
+        public boolean isPersonalTrainer() { return personalTrainer; }
+
+        public void setName(String name) { this.name = name; }
+        public void setSurname(String surname) { this.surname = surname; }
+        public void setIdNo(String idNo) { this.idNo = idNo; }
+        public void setGender(String gender) { this.gender = gender; }
+        public void setContractType(String contractType) { this.contractType = contractType; }
+        public void setPersonalTrainer(boolean personalTrainer) { this.personalTrainer = personalTrainer; }
+    }
+}
+
+
+//application 2
+System.out.println("load voucher" );
+private void loadVouchers(File file) {
+    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        voucherArea.setText(""); // Clear any existing content
+        String line;
+        while ((line = reader.readLine()) != null) {
+            voucherArea.append(line + "\n"); // Append in correct position with newline
+        }
+    } catch (IOException ex) { // Error handling implemented
+        JOptionPane.showMessageDialog(this, "Error reading file: " + ex.getMessage());
+    }
+}
+
+
+System.out.println("count " );
+private void countValidVouchers() {
+    String[] vouchers = voucherArea.getText().split("\\n"); // Extracting voucher codes
+    int validCount = 0;
+    for (String code : vouchers) { // Looping over extracted vouchers
+        Voucher voucher = new Voucher(code.trim()); // Create voucher object with extracted code
+        if (!voucherCheck.checkVoucher(voucher)) { // Checking voucher
+            validCount++; // Updating some counter if valid
+        }
+    }
+    validVoucherCountLabel.setText("Valid Voucher Count: " + validCount); // Updating label
+}
+
+System.out.println("save voucher " );
+private void saveVoucherReport() {
+    String report = validVoucherCountLabel.getText(); // Get the JLabel text
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter("voucherCheckReport.txt", true))) { // File opened with classes for reading
+        writer.write(report); // Write JLabel content
+        writer.newLine(); // Add a newline
+        JOptionPane.showMessageDialog(this, "Report saved successfully.");
+    } catch (IOException ex) { // Error handling implemented
+        JOptionPane.showMessageDialog(this, "Error saving report: " + ex.getMessage());
+    }
+}
